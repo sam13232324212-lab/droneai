@@ -417,7 +417,10 @@ export default function DroneEduExpert() {
               <span>Connect with an Expert</span>
             </DialogTitle>
             <DialogDescription>
-              Get personalized guidance from a DroneCareerPro expert. We'll help you find the right training path for your goals.
+              {lastShownAt > 0 
+                ? "Still have questions? Let our experts provide personalized guidance for your drone career journey."
+                : "Get personalized guidance from a DroneCareerPro expert. We'll help you find the right training path for your goals."
+              }
             </DialogDescription>
           </DialogHeader>
           
