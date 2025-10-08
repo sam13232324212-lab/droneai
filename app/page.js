@@ -614,34 +614,34 @@ export default function DroneEduExpert() {
                     </div>
                   </div>
                 </motion.div>
-              ))}
-            </AnimatePresence>
+                  ))}
+                </AnimatePresence>
 
-            {/* Loading indicator */}
-            {isLoading && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex justify-start"
-              >
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
-                    <Bot className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="bg-white border border-gray-200 p-4 rounded-2xl">
-                    <div className="flex space-x-2">
-                      <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" />
-                      <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                      <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+                {/* Loading indicator */}
+                {isLoading && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex justify-start"
+                  >
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
+                        <Bot className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="bg-white border border-gray-200 p-4 rounded-2xl">
+                        <div className="flex space-x-2">
+                          <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" />
+                          <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                          <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
+                  </motion.div>
+                )}
 
-            <div ref={scrollRef} />
-          </div>
-        </ScrollArea>
+                <div ref={scrollRef} />
+              </div>
+            </ScrollArea>
 
             {/* Input Area - Chat Style */}
             <div className="border-t border-gray-200 bg-white p-4">
