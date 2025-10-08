@@ -643,36 +643,38 @@ export default function DroneEduExpert() {
           </div>
         </ScrollArea>
 
-        {/* Input Area */}
-        <div className="border-t border-gray-200 bg-white p-4">
-          <div className="max-w-4xl mx-auto">
-            <form 
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSendMessage();
-              }}
-              className="flex space-x-3"
-            >
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Message DroneEdu Expert..."
-                className="flex-1 text-base border-gray-300 focus:border-purple-400 focus:ring-purple-400"
-                disabled={isLoading}
-              />
-              <Button 
-                type="submit" 
-                disabled={isLoading || !input.trim()}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 px-6"
-              >
-                <Send className="w-5 h-5" />
-              </Button>
-            </form>
-            <p className="text-xs text-gray-500 mt-2 text-center">
-              Powered by AI • Information from CASA & training providers
-            </p>
-          </div>
-        </div>
+            {/* Input Area - Chat Style */}
+            <div className="border-t border-gray-200 bg-white p-4">
+              <div className="max-w-4xl mx-auto">
+                <form 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }}
+                  className="flex space-x-3"
+                >
+                  <Input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Message DroneEdu Expert..."
+                    className="flex-1 text-base border-gray-300 focus:border-purple-400 focus:ring-purple-400"
+                    disabled={isLoading}
+                  />
+                  <Button 
+                    type="submit" 
+                    disabled={isLoading || !input.trim()}
+                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 px-6"
+                  >
+                    <Send className="w-5 h-5" />
+                  </Button>
+                </form>
+                <p className="text-xs text-gray-500 mt-2 text-center">
+                  Powered by AI • Information from CASA & training providers
+                </p>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Lead Capture Dialog */}
