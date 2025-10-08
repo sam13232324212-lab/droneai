@@ -22,6 +22,7 @@ export default function DroneEduExpert() {
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const [messageCount, setMessageCount] = useState(0);
+  const [lastShownAt, setLastShownAt] = useState(0);
   const [userLocation, setUserLocation] = useState('');
   
   const [leadForm, setLeadForm] = useState({
@@ -40,15 +41,21 @@ export default function DroneEduExpert() {
     }
   }, [messages]);
 
-  // Show lead form after 3 helpful responses
+  // Show lead form after every 3 helpful responses (until submitted)
   useEffect(() => {
-    if (messageCount >= 3 && !leadSubmitted && !showLeadForm) {
-      const timer = setTimeout(() => {
-        setShowLeadForm(true);
-      }, 2000);
-      return () => clearTimeout(timer);
+    if (!leadSubmitted && !showLeadForm) {
+      // Show after first 3 messages, then every 3 messages after that
+      const messagesSinceLastShown = messageCount - lastShownAt;
+      
+      if (messagesSinceLastShown >= 3) {
+        const timer = setTimeout(() => {
+          setShowLeadForm(true);
+          setLastShownAt(messageCount);
+        }, 2000);
+        return () => clearTimeout(timer);
+      }
     }
-  }, [messageCount, leadSubmitted, showLeadForm]);
+  }, [messageCount, leadSubmitted, showLeadForm, lastShownAt]);
 
   const handleSendMessage = async () => {
     if (!input.trim() || isLoading) return;
