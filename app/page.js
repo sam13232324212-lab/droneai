@@ -2,10 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Bot, User, Plane, CheckCircle2, Sparkles, Globe, BookOpen, TrendingUp } from 'lucide-react';
+import { Send, Bot, User, Plane, CheckCircle2, Sparkles, BookOpen, TrendingUp, Building2, Shield, DollarSign, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
@@ -13,7 +13,7 @@ export default function DroneEduExpert() {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: '👋 G\'day! I\'m DroneEdu Expert, your AI guide to drone careers in Australia.\n\n✨ Ask me about CASA regulations, RePL/ReOC licensing, training providers, or career opportunities!\n\n🚁 I scrape live data from CASA and training providers to give you the most current information.'
+      content: '👋 Hi there! I\'m your DroneEdu Expert.\n\nI can help you understand CASA drone regulations, RePL/ReOC licensing, training options, career pathways, and everything you need to start your drone career in Australia.\n\n**I provide:**\n- Current information from CASA official sources\n- Training provider comparisons\n- Career guidance and salary insights\n- Location-specific recommendations\n\n**What would you like to know?**'
     }
   ]);
   const [input, setInput] = useState('');
@@ -22,6 +22,7 @@ export default function DroneEduExpert() {
   const [showLeadForm, setShowLeadForm] = useState(false);
   const [leadSubmitted, setLeadSubmitted] = useState(false);
   const [messageCount, setMessageCount] = useState(0);
+  const [userLocation, setUserLocation] = useState('');
   
   const [leadForm, setLeadForm] = useState({
     firstName: '',
@@ -75,7 +76,8 @@ export default function DroneEduExpert() {
         body: JSON.stringify({
           message: userMessage,
           sessionId: sessionId,
-          conversationHistory: conversationHistory
+          conversationHistory: conversationHistory,
+          userLocation: userLocation || 'Australia'
         }),
       });
 
@@ -84,7 +86,7 @@ export default function DroneEduExpert() {
       // Always add the response, even if there's an error
       setMessages([...newMessages, {
         role: 'assistant',
-        content: data.response || '😕 Sorry, I encountered an error. Please try again.'
+        content: data.response || '😕 I apologize for the technical issue. Please try rephrasing your question or ask about:\n\n• RePL licensing requirements\n• ReOC certification process\n• Training provider comparisons\n• Career opportunities and salaries\n• CASA safety regulations\n\n**Official CASA Website:** https://www.casa.gov.au/drones'
       }]);
 
       if (data.sessionId) {
@@ -95,7 +97,7 @@ export default function DroneEduExpert() {
       console.error('Error:', error);
       setMessages([...newMessages, {
         role: 'assistant',
-        content: '😕 Connection error. Please check your internet and try again.'
+        content: '**Connection Error**\n\nI\'m having trouble connecting right now. Here are some quick answers:\n\n**RePL (Remote Pilot License):**\n- Required for commercial drone operations\n- Cost: $2,000 - $4,000\n- Duration: 2-4 weeks\n- Available nationwide\n\n**Training Providers:**\n- DroneCareerPro: $2,995\n- Global Drone Solutions: $2,750\n\n**Official Information:** https://www.casa.gov.au/drones\n\nPlease try your question again, or I can connect you with an expert.'
       }]);
     } finally {
       setIsLoading(false);
@@ -106,7 +108,7 @@ export default function DroneEduExpert() {
     e.preventDefault();
     
     try {
-      const response = await fetch('/api/leads', {
+      await fetch('/api/leads', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -114,15 +116,13 @@ export default function DroneEduExpert() {
         body: JSON.stringify(leadForm),
       });
 
-      const data = await response.json();
-
       setLeadSubmitted(true);
       setShowLeadForm(false);
       
       // Add confirmation message to chat
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: `🎉 Thanks ${leadForm.firstName}! A DroneCareerPro expert will contact you soon at ${leadForm.email}.\n\n✅ Feel free to keep asking questions while you wait!`
+        content: `**Thank you, ${leadForm.firstName}!** 🎉\n\nA DroneCareerPro expert will contact you soon at:\n**${leadForm.email}**\n\nFeel free to continue asking questions while you wait. I\'m here to help!`
       }]);
 
       // Reset form
@@ -135,191 +135,278 @@ export default function DroneEduExpert() {
       });
     } catch (error) {
       console.error('Error submitting lead:', error);
-      alert('Thank you! We\'ve received your information.');
       setShowLeadForm(false);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: '**Thank you for your interest!**\n\nWe\'ve received your information and will be in touch soon.'
+      }]);
     }
   };
 
-  const quickActions = [
-    { icon: BookOpen, text: 'What is RePL?', query: 'What is a RePL and how do I get one?' },
-    { icon: TrendingUp, text: 'Career Pathways', query: 'What are the career opportunities for drone pilots in Australia?' },
-    { icon: Globe, text: 'Training Providers', query: 'Compare drone training providers in Australia' },
-    { icon: Sparkles, text: 'CASA Rules', query: 'What are the CASA safety rules for drones?' },
+  const quickPrompts = [
+    { 
+      icon: BookOpen, 
+      title: 'RePL Requirements', 
+      query: 'What are the requirements to get a RePL in Australia?',
+      subtitle: 'Licensing & certification'
+    },
+    { 
+      icon: Building2, 
+      title: 'Training Providers', 
+      query: 'Compare drone training providers in Australia with pricing',
+      subtitle: 'Courses & prices'
+    },
+    { 
+      icon: TrendingUp, 
+      title: 'Career Opportunities', 
+      query: 'What career opportunities are available for drone pilots in Australia?',
+      subtitle: 'Jobs & salaries'
+    },
+    { 
+      icon: Shield, 
+      title: 'CASA Regulations', 
+      query: 'What are the main CASA safety rules for flying drones in Australia?',
+      subtitle: 'Safety & compliance'
+    },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 relative overflow-hidden">
-      {/* Animated background  elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
-      </div>
-
-      {/* Header with glassmorphism */}
-      <header className="relative backdrop-blur-md bg-white/5 border-b border-white/10 shadow-2xl">
-        <div className="container mx-auto px-4 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="container mx-auto px-6 py-5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-3 rounded-2xl shadow-lg">
-                <Plane className="w-7 h-7 text-white" />
+            <div className="flex items-center space-x-3">
+              <div className="bg-gradient-to-br from-purple-600 to-blue-600 p-2.5 rounded-xl">
+                <Plane className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-white">DroneEdu Expert</h1>
-                <p className="text-sm text-blue-200">AI-Powered Australian Drone Career Guide</p>
+                <h1 className="text-xl font-semibold text-gray-900">DroneEdu Expert</h1>
+                <p className="text-sm text-gray-500">Australian Drone Career Assistant</p>
               </div>
-            </div>
-            <div className="hidden md:flex items-center space-x-2 text-xs text-blue-200">
-              <Sparkles className="w-4 h-4" />
-              <span>Live data from CASA & training providers</span>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Main Chat Area */}
-      <div className="container mx-auto px-4 py-8 max-w-5xl relative z-10">
-        {/* Glassmorphism card */}
-        <Card className="h-[calc(100vh-280px)] flex flex-col shadow-2xl backdrop-blur-xl bg-white/10 border-white/20">
-          {/* Messages Area */}
-          <ScrollArea className="flex-1 p-6">
-            <div className="space-y-6">
-              <AnimatePresence>
-                {messages.map((message, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.4, ease: 'easeOut' }}
-                    className={`flex items-start space-x-3 ${
-                      message.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''
-                    }`}
-                  >
-                    {/* Avatar with glow effect */}
-                    <motion.div
-                      whileHover={{ scale: 1.1 }}
-                      className={`flex-shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg ${
-                        message.role === 'user' 
-                          ? 'bg-gradient-to-br from-blue-500 to-blue-600 shadow-blue-500/50' 
-                          : 'bg-gradient-to-br from-purple-500 to-pink-600 shadow-purple-500/50'
-                      }`}
-                    >
-                      {message.role === 'user' ? (
-                        <User className="w-6 h-6 text-white" />
-                      ) : (
-                        <Bot className="w-6 h-6 text-white" />
-                      )}
-                    </motion.div>
+      {/* Main Content */}
+      <div className="container mx-auto px-6 py-8 max-w-6xl">
+        {messages.length === 1 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-8"
+          >
+            <h2 className="text-4xl font-bold mb-3">
+              <span className="text-gray-800">Hi there,</span>{' '}
+              <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                aspiring pilot
+              </span>
+            </h2>
+            <h3 className="text-2xl font-medium text-gray-700 mb-3">
+              What would you like to know?
+            </h3>
+            <p className="text-gray-500 text-sm mb-8">
+              Use one of the common prompts below or ask your own question
+            </p>
 
-                    {/* Message Bubble with glassmorphism */}
-                    <div className={`flex-1 max-w-[85%] ${
-                      message.role === 'user' ? 'text-right' : ''
-                    }`}>
-                      <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        className={`inline-block p-5 rounded-2xl backdrop-blur-md shadow-xl ${
-                          message.role === 'user'
-                            ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white'
-                            : 'bg-white/90 text-gray-800 border border-white/20'
-                        }`}
-                      >
-                        <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                          {message.content}
+            {/* Quick Prompt Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+              {quickPrompts.map((prompt, index) => (
+                <motion.button
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ y: -4, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }}
+                  onClick={() => setInput(prompt.query)}
+                  className="bg-white rounded-xl p-5 border border-gray-200 hover:border-purple-300 transition-all text-left"
+                >
+                  <div className="flex flex-col items-start space-y-3">
+                    <div className="p-2 bg-purple-50 rounded-lg">
+                      <prompt.icon className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 text-sm mb-1">{prompt.title}</h4>
+                      <p className="text-xs text-gray-500">{prompt.subtitle}</p>
+                    </div>
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => window.location.reload()}
+              className="text-sm text-gray-500 hover:text-purple-600 flex items-center justify-center mx-auto space-x-2"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Refresh Prompts</span>
+            </button>
+          </motion.div>
+        )}
+
+        {/* Chat Messages */}
+        {messages.length > 1 && (
+          <Card className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+            <ScrollArea className="h-[calc(100vh-350px)] p-6">
+              <div className="space-y-6 max-w-4xl mx-auto">
+                <AnimatePresence>
+                  {messages.slice(1).map((message, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div className={`flex items-start space-x-3 max-w-3xl ${message.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                        {/* Avatar */}
+                        <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
+                          message.role === 'user' 
+                            ? 'bg-blue-600' 
+                            : 'bg-gradient-to-br from-purple-600 to-blue-600'
+                        }`}>
+                          {message.role === 'user' ? (
+                            <User className="w-5 h-5 text-white" />
+                          ) : (
+                            <Bot className="w-5 h-5 text-white" />
+                          )}
                         </div>
-                      </motion.div>
+
+                        {/* Message Content */}
+                        <div className={`flex-1 ${message.role === 'user' ? 'text-right' : ''}`}>
+                          <div className={`inline-block text-left p-4 rounded-2xl ${
+                            message.role === 'user'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-50 text-gray-800 border border-gray-100'
+                          }`}>
+                            <div className="prose prose-sm max-w-none">
+                              {message.content.split('\n').map((line, i) => {
+                                // Bold text with **
+                                if (line.includes('**')) {
+                                  const parts = line.split('**');
+                                  return (
+                                    <p key={i} className={`mb-2 last:mb-0 ${message.role === 'user' ? 'text-white' : 'text-gray-800'}`}>
+                                      {parts.map((part, j) => 
+                                        j % 2 === 1 ? <strong key={j} className="font-semibold">{part}</strong> : part
+                                      )}
+                                    </p>
+                                  );
+                                }
+                                // Bullet points
+                                if (line.trim().startsWith('•') || line.trim().startsWith('-')) {
+                                  return (
+                                    <li key={i} className={`ml-4 mb-1 ${message.role === 'user' ? 'text-white' : 'text-gray-700'}`}>
+                                      {line.replace(/^[•-]\s*/, '')}
+                                    </li>
+                                  );
+                                }
+                                // Links
+                                if (line.includes('http')) {
+                                  const urlRegex = /(https?:\/\/[^\s]+)/g;
+                                  const parts = line.split(urlRegex);
+                                  return (
+                                    <p key={i} className={`mb-2 last:mb-0 ${message.role === 'user' ? 'text-white' : 'text-gray-800'}`}>
+                                      {parts.map((part, j) => 
+                                        urlRegex.test(part) ? 
+                                          <a key={j} href={part} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline font-medium">
+                                            {part}
+                                          </a> : part
+                                      )}
+                                    </p>
+                                  );
+                                }
+                                // Empty lines
+                                if (line.trim() === '') {
+                                  return <div key={i} className="h-2" />;
+                                }
+                                // Regular text
+                                return (
+                                  <p key={i} className={`mb-2 last:mb-0 ${message.role === 'user' ? 'text-white' : 'text-gray-700'}`}>
+                                    {line}
+                                  </p>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+
+                {/* Loading indicator */}
+                {isLoading && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex justify-start"
+                  >
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
+                        <Bot className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                        <div className="flex space-x-2">
+                          <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" />
+                          <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                          <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+                        </div>
+                      </div>
                     </div>
                   </motion.div>
-                ))}
-              </AnimatePresence>
+                )}
 
-              {/* Loading indicator with better animation */}
-              {isLoading && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex items-start space-x-3"
-                >
-                  <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/50">
-                    <Bot className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="bg-white/90 backdrop-blur-md p-5 rounded-2xl shadow-xl border border-white/20">
-                    <div className="flex space-x-2">
-                      <motion.div
-                        className="w-3 h-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
-                        animate={{ scale: [1, 1.5, 1] }}
-                        transition={{ duration: 1, repeat: Infinity, delay: 0 }}
-                      />
-                      <motion.div
-                        className="w-3 h-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
-                        animate={{ scale: [1, 1.5, 1] }}
-                        transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
-                      />
-                      <motion.div
-                        className="w-3 h-3 bg-gradient-to-r from-pink-500 to-blue-500 rounded-full"
-                        animate={{ scale: [1, 1.5, 1] }}
-                        transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
-                      />
-                    </div>
-                  </div>
-                </motion.div>
-              )}
+                <div ref={scrollRef} />
+              </div>
+            </ScrollArea>
+          </Card>
+        )}
 
-              <div ref={scrollRef} />
-            </div>
-          </ScrollArea>
-
-          {/* Input Area with glassmorphism */}
-          <CardContent className="border-t border-white/10 backdrop-blur-md bg-white/5 p-6">
-            <form 
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleSendMessage();
-              }}
-              className="flex space-x-3"
-            >
+        {/* Input Area */}
+        <Card className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSendMessage();
+            }}
+            className="space-y-3"
+          >
+            <div className="flex space-x-3">
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about RePL, training, careers, or regulations..."
-                className="flex-1 text-base bg-white/10 backdrop-blur-md border-white/20 text-white placeholder:text-white/50 focus:border-blue-400 focus:ring-blue-400"
+                placeholder="Ask whatever you want..."
+                className="flex-1 text-base border-gray-200 focus:border-purple-400 focus:ring-purple-400"
                 disabled={isLoading}
               />
               <Button 
                 type="submit" 
                 disabled={isLoading || !input.trim()}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 px-6"
               >
                 <Send className="w-5 h-5" />
               </Button>
-            </form>
-            <p className="text-xs text-white/50 mt-3 text-center">
-              🌐 Live data from CASA • Powered by AI • Information verified with official sources
-            </p>
-          </CardContent>
+            </div>
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <div className="flex items-center space-x-4">
+                <button type="button" className="hover:text-purple-600 flex items-center space-x-1">
+                  <MapPin className="w-3 h-3" />
+                  <span>Add Location</span>
+                </button>
+              </div>
+              <span>Powered by AI • Data from CASA & training providers</span>
+            </div>
+          </form>
         </Card>
-
-        {/* Quick Actions with glassmorphism */}
-        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-          {quickActions.map((action, index) => (
-            <motion.button
-              key={index}
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setInput(action.query)}
-              className="flex items-center space-x-2 p-4 rounded-xl backdrop-blur-md bg-white/10 border border-white/20 hover:bg-white/20 transition-all shadow-lg text-white text-sm"
-            >
-              <action.icon className="w-5 h-5 text-blue-300" />
-              <span>{action.text}</span>
-            </motion.button>
-          ))}
-        </div>
       </div>
 
       {/* Lead Capture Dialog */}
       <Dialog open={showLeadForm} onOpenChange={setShowLeadForm}>
-        <DialogContent className="sm:max-w-md backdrop-blur-xl bg-white/95">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center space-x-2 text-xl">
-              <CheckCircle2 className="w-6 h-6 text-green-600" />
+              <CheckCircle2 className="w-6 h-6 text-purple-600" />
               <span>Connect with an Expert</span>
             </DialogTitle>
             <DialogDescription>
@@ -380,7 +467,7 @@ export default function DroneEduExpert() {
             </div>
 
             <div className="flex space-x-2">
-              <Button type="submit" className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+              <Button type="submit" className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
                 Connect Now
               </Button>
               <Button 
