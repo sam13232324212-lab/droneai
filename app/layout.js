@@ -1,8 +1,8 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'Next.js MongoDB Template',
-  description: 'A simple template with App Router, MongoDB, and shadcn/ui',
+  title: 'DroneEdu Expert | Australian Drone Career Guide',
+  description: 'AI-powered assistant helping Australians understand CASA drone regulations, RePL/ReOC licensing, training options, and career pathways. Get expert guidance on becoming a professional drone pilot.',
 }
 
 export default function RootLayout({ children }) {
