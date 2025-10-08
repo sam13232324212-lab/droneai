@@ -383,33 +383,159 @@ export default function DroneEduExpert() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Top Bar */}
-        <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-            >
-              <Menu className="w-5 h-5" />
-            </Button>
-            <div className="flex items-center space-x-2">
-              <div className="bg-gradient-to-br from-purple-600 to-blue-600 p-2 rounded-lg">
-                <Plane className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-semibold text-gray-900">
-                  {currentConversation?.title || 'DroneEdu Expert'}
-                </h1>
-                <p className="text-xs text-gray-500">Australian Drone Career Assistant</p>
+        {/* Top Bar - Only show when not on dashboard */}
+        {!showDashboard && (
+          <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+              >
+                <Menu className="w-5 h-5" />
+              </Button>
+              <div className="flex items-center space-x-2">
+                <div className="bg-gradient-to-br from-purple-600 to-blue-600 p-2 rounded-lg">
+                  <Plane className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-lg font-semibold text-gray-900">
+                    {currentConversation?.title || 'DroneEdu Expert'}
+                  </h1>
+                  <p className="text-xs text-gray-500">Australian Drone Career Assistant</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Chat Messages */}
-        <ScrollArea className="flex-1 p-4">
-          <div className="max-w-4xl mx-auto space-y-6">
+        {/* Dashboard View - Show when no messages yet */}
+        {showDashboard ? (
+          <div className="flex-1 flex flex-col">
+            {/* Header */}
+            <header className="bg-white border-b border-gray-200">
+              <div className="container mx-auto px-6 py-5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-gradient-to-br from-purple-600 to-blue-600 p-2.5 rounded-xl">
+                      <Plane className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h1 className="text-xl font-semibold text-gray-900">DroneEdu Expert</h1>
+                      <p className="text-sm text-gray-500">Australian Drone Career Assistant</p>
+                    </div>
+                  </div>
+                  {conversations.length > 1 && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setSidebarOpen(!sidebarOpen)}
+                      className="lg:hidden"
+                    >
+                      <Menu className="w-5 h-5" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </header>
+
+            {/* Dashboard Content */}
+            <ScrollArea className="flex-1">
+              <div className="container mx-auto px-6 py-8 max-w-6xl">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center mb-8"
+                >
+                  <h2 className="text-4xl font-bold mb-3">
+                    <span className="text-gray-800">Hi there,</span>{' '}
+                    <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                      aspiring pilot
+                    </span>
+                  </h2>
+                  <h3 className="text-2xl font-medium text-gray-700 mb-3">
+                    What would you like to know?
+                  </h3>
+                  <p className="text-gray-500 text-sm mb-8">
+                    Use one of the common prompts below or ask your own question
+                  </p>
+
+                  {/* Quick Prompt Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    {quickPrompts.map((prompt, index) => (
+                      <motion.button
+                        key={index}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        whileHover={{ y: -4, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)' }}
+                        onClick={() => setInput(prompt.query)}
+                        className="bg-white rounded-xl p-5 border border-gray-200 hover:border-purple-300 transition-all text-left"
+                      >
+                        <div className="flex flex-col items-start space-y-3">
+                          <div className="p-2 bg-purple-50 rounded-lg">
+                            <prompt.icon className="w-5 h-5 text-purple-600" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-gray-900 text-sm mb-1">{prompt.title}</h4>
+                            <p className="text-xs text-gray-500">{prompt.subtitle}</p>
+                          </div>
+                        </div>
+                      </motion.button>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="text-sm text-gray-500 hover:text-purple-600 flex items-center justify-center mx-auto space-x-2"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span>Refresh Prompts</span>
+                  </button>
+                </motion.div>
+              </div>
+            </ScrollArea>
+
+            {/* Input Area - Dashboard Style */}
+            <div className="border-t border-gray-200 bg-white p-4">
+              <div className="max-w-4xl mx-auto">
+                <Card className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+                  <form 
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }}
+                    className="space-y-3"
+                  >
+                    <div className="flex space-x-3">
+                      <Input
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="Ask whatever you want..."
+                        className="flex-1 text-base border-gray-200 focus:border-purple-400 focus:ring-purple-400"
+                        disabled={isLoading}
+                      />
+                      <Button 
+                        type="submit" 
+                        disabled={isLoading || !input.trim()}
+                        className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 px-6"
+                      >
+                        <Send className="w-5 h-5" />
+                      </Button>
+                    </div>
+                    <div className="flex items-center justify-center text-xs text-gray-500">
+                      <span>Powered by AI • Data from CASA & training providers</span>
+                    </div>
+                  </form>
+                </Card>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Chat View - Show when conversation started */}
+            <ScrollArea className="flex-1 p-4">
+              <div className="max-w-4xl mx-auto space-y-6">
             <AnimatePresence>
               {messages.map((message, index) => (
                 <motion.div
