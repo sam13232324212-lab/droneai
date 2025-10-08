@@ -282,12 +282,42 @@ export default function DroneEduExpert() {
   }, []);
 
   const currentConversation = conversations.find(c => c.id === currentConversationId);
+  
+  // Check if we should show dashboard (only 1 message = welcome message)
+  const showDashboard = messages.length <= 1;
+
+  const quickPrompts = [
+    { 
+      icon: BookOpen, 
+      title: 'RePL Requirements', 
+      query: 'What are the requirements to get a RePL in Australia?',
+      subtitle: 'Licensing & certification'
+    },
+    { 
+      icon: Building2, 
+      title: 'Training Providers', 
+      query: 'Compare drone training providers in Australia with pricing',
+      subtitle: 'Courses & prices'
+    },
+    { 
+      icon: TrendingUp, 
+      title: 'Career Opportunities', 
+      query: 'What career opportunities are available for drone pilots in Australia?',
+      subtitle: 'Jobs & salaries'
+    },
+    { 
+      icon: Shield, 
+      title: 'CASA Regulations', 
+      query: 'What are the main CASA safety rules for flying drones in Australia?',
+      subtitle: 'Safety & compliance'
+    },
+  ];
 
   return (
     <div className="flex h-screen bg-gray-50">
-      {/* Sidebar */}
+      {/* Sidebar - Only show when not on dashboard */}
       <AnimatePresence>
-        {sidebarOpen && (
+        {sidebarOpen && !showDashboard && (
           <motion.div
             initial={{ x: -300 }}
             animate={{ x: 0 }}
