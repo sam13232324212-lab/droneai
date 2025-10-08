@@ -537,8 +537,8 @@ export default function DroneEduExpert() {
             {/* Chat View - Show when conversation started */}
             <ScrollArea className="flex-1 p-4">
               <div className="max-w-4xl mx-auto space-y-6">
-            <AnimatePresence>
-              {messages.map((message, index) => (
+                <AnimatePresence>
+                  {messages.map((message, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, y: 10 }}
